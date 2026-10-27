@@ -16,6 +16,5 @@ __pycache__/
 *.bak
 *.log
 *.txt
-*.toml
 *.egg-info
 *.json
