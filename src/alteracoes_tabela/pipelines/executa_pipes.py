@@ -13,6 +13,8 @@ from alteracoes_tabela.transform.J_dados_produtos import coleta_dados_categoria
 from alteracoes_tabela.transform.K_valores_filtrados_qtd import desconsidera_valores_por_quantidade
 from alteracoes_tabela.transform.L_selecao_colunas import selecionar_organizar_colunas
 
+from alteracoes_tabela.load.carrega_tabelas import carrega_tabela
+
 from alteracoes_tabela.utils.desconsidera_valores import (remove_valor_zerado, desconsidera_nulos)
 from alteracoes_tabela.utils.padronizar_colunas import (padroniza_data, transforma_float, altera_nome_coluna)
 from alteracoes_tabela.utils.range_datas import define_range_datas
@@ -26,7 +28,7 @@ def extract():
 
 def transform(df, divisao):
     inicio, fim = define_range_datas(7)
-    df = padroniza_data(df)
+    df = padroniza_data(df,'DATA_ALTERACAO')
     df = transforma_float(df, 'VLRCUSTOLIQUIDO')
     df = filtra_divisao(df, divisao)
     df = regra_ordenação_df(df)
@@ -47,7 +49,7 @@ def transform(df, divisao):
 
     df = desconsidera_valores_por_quantidade(df, 'SEQFORNECEDOR', 5)
 
-    df = altera_nome_coluna(df,'FANTASIA','FORNECEDOR')
+    df = altera_nome_coluna(df,'NOMERAZAO','FORNECEDOR')
 
     df = selecionar_organizar_colunas(df,
                                     ['NRODIVISAO','SEQFAMILIA','SEQPRODUTOS','N1','N2','SEQFORNECEDOR',
@@ -56,7 +58,6 @@ def transform(df, divisao):
     
     return df
 
-df = extract()
-df = transform(df, 1)
-print(df.dtypes)
-df.to_excel(r'S:\price\TABELA_FORNECEDOR_AJUSTES_DE_PREÇO\alteracoes.xlsx', index=False)
+def load(df):
+    pasta = r'S:\price\RELATORIOS\ALTERACOES_TABELA_COMERCIAL\src\alteracoes_tabela\data\processed'
+    carrega_tabela(df)
