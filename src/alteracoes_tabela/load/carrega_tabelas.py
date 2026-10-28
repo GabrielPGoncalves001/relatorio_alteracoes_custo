@@ -1,4 +1,6 @@
 import os
+import pandas as pd
+
 
 def carrega_tabela(df, pasta, nome_arquivo, extensao='xlsx'):
     '''Extensões permitidas: xlsx, csv'''
@@ -22,3 +24,8 @@ def carrega_tabela(df, pasta, nome_arquivo, extensao='xlsx'):
 
     dict_decisao[extensao](df)
     print(f'[OK] Tabela salva como: {caminho}')
+
+def carrega_base_excel(caminho, tabelas):
+    with pd.ExcelWriter(caminho,engine='openpyxl') as writer:
+        for nome_aba, df in tabelas.items():
+            df.to_excel(writer,sheet_name=nome_aba,index=False)
