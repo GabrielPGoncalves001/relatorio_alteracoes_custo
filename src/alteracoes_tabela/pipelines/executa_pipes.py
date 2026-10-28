@@ -32,7 +32,7 @@ def transform(df, divisao):
     df = filtra_divisao(df, divisao)
     carrega_tabela(df, STAGING, f'Step1_tabela_filtrada_divisao_{divisao}')
     
-    df = regra_ordenação_df(df)
+    df = regra_ordenação_df(df, ['SEQFAMILIA','SEQFORNECEDOR','DATA_ALTERACAO'])
 
     df = regra_coluna_custo_liquido_anterior(df,'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR')
     df = desconsidera_nulos(df)

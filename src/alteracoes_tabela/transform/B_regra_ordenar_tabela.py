@@ -1,8 +1,8 @@
-def regra_ordenação_df(df):
+def regra_ordenação_df(df, colunas):
     if df is None:
         raise ValueError("[EERO] Parâmetro esperava receber uma tabela mas está vazio.\nFunção :: regra_ordenação_df")
 
-    colunas_obrigatorias = ['SEQFAMILIA','SEQFORNECEDOR','DATA_ALTERACAO']
+    colunas_obrigatorias = colunas
     colunas_faltantes = [col for col in colunas_obrigatorias
                          if col not in df.columns]
     if colunas_faltantes:
