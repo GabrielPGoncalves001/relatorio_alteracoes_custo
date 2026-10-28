@@ -1,6 +1,11 @@
 from alteracoes_tabela.extract.query_familias import read_query_familia
 from alteracoes_tabela.utils.query_utils import parametros_query
+from alteracoes_tabela.load.carrega_tabelas import carrega_tabela
+
+from alteracoes_tabela.utils.config import RAW
+
 import pandas as pd
+import os
 
 def coleta_dados_categoria(df):
     if df is None:
@@ -16,6 +21,7 @@ def coleta_dados_categoria(df):
     
     try:
         df_familia = read_query_familia(params, placeholders)
+        carrega_tabela(df_familia, RAW, 'df_dados_categ_raw', 'xlsx')
     except Exception as e:
         raise RuntimeError(f'[ERRO] Erro tentando ler a query com dados de produtos na função coleta_dados_categoria.\n{e}')
     
