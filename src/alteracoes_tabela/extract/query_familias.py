@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0,r'S:\price\dev\pipelines\BANCO')
-from conectar_banco import main_db # type: ignore
+from conectar_banco import main_db
 import os
 import pandas as pd
 
