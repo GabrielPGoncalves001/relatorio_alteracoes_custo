@@ -20,5 +20,6 @@ def filtra_df_pelo_range_datas(df, data_inicio:datetime, data_fim:datetime):
             (df['DATA_ALTERACAO'] >= data_inicio) &
             (df['DATA_ALTERACAO'] <= data_fim)]
         print(f'[OK] Tabela filtrada pelo range data: de {data_inicio} até {data_fim}.')
+        return df
     except Exception as e:
         raise RuntimeError(f'[ERRO] Erro tentando filtrar a tabela pelo range de data estabelecido.\nFunção :: filtra_df_pelo_range_datas\n{e}')

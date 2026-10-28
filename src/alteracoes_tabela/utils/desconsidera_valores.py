@@ -10,7 +10,7 @@ def desconsidera_nulos(df):
     if df is None:
         raise ValueError('[ERRO] Tabela informada na função (desconsidera_nulos) está vazio.')
     
-    info = df.isna().sum()
+    info = df.isna().sum().sum()
     df = df.dropna()
     print(f'[OK] Foram removidos {info} valores nulos da tabela.')
     return df

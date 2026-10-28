@@ -6,8 +6,8 @@ def formato_numerico_percetual(df, coluna_valor):
     if coluna_valor not in df.columns:
         raise KeyError(f'[ERRO] Coluna {coluna_valor} não encontrada na tabela informada na função.')
 
-    if not isinstance(coluna_valor,int) or isinstance(coluna_valor,float):
-        raise TypeError('[ERRO] Esperava-se uma coluna com valores do tipo numérico (float ou int).\nFunção :: formato_numerico_percentual')
+    #if not isinstance(coluna_valor,int) or isinstance(coluna_valor,float):
+        #raise TypeError('[ERRO] Esperava-se uma coluna com valores do tipo numérico (float ou int).\nFunção :: formato_numerico_percentual')
 
     try:
         df[coluna_valor] = df[coluna_valor].map('{:.2f}%'.format)

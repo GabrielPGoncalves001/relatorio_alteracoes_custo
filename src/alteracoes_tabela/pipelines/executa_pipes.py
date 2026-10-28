@@ -25,6 +25,7 @@ def extract():
     carrega_tabela(df, RAW,'tabela_custos_raw','xlsx')
     return df
 
+
 def transform(df, divisao):
     inicio, fim = define_range_datas(7)
     df = padroniza_data(df,'DATA_ALTERACAO')
@@ -64,5 +65,5 @@ def transform(df, divisao):
     
     return df
 
-def load(df):
-    carrega_tabela(df, PROCESSED,'BASE_RELATORIO_ALTERACOES_CUSTO','xlsx')
+def load(df, nome):
+    carrega_tabela(df, PROCESSED,nome,'xlsx')
