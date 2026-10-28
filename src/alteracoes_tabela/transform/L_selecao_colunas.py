@@ -1,9 +1,5 @@
 def selecionar_organizar_colunas(df, colunas):
     
-    colunas = ['NRODIVISAO','SEQFAMILIA','SEQPRODUTOS','N1','N2','SEQFORNECEDOR',
-               'FORNECEDOR','VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR',
-               'VARIACAO_LIQUIDA_ABSOLUTA','VARIACAO_LIQUIDA_PERCENTUAL']
-    
     colunas_faltantes = [col for col in colunas
                          if col not in df.columns]
     if colunas_faltantes:

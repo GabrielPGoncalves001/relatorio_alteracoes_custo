@@ -1,8 +1,17 @@
-from alteracoes_tabela.extract.query_familias import read_query_familia
 from alteracoes_tabela.extract.query_tabela_fornecedor import tabela_fornecedor
 
 from alteracoes_tabela.transform.A_regra_divisao import filtra_divisao
 from alteracoes_tabela.transform.B_regra_ordenar_tabela import regra_ordenação_df
+from alteracoes_tabela.transform.C_cria_coluna_custo_anterior import regra_coluna_custo_liquido_anterior
+from alteracoes_tabela.transform.D_cria_coluna_considera import cria_coluna_de_validacao
+from alteracoes_tabela.transform.E_filtro_registros_validos import filtra_valores_validos
+from alteracoes_tabela.transform.F_filtro_de_datas import filtra_df_pelo_range_datas
+from alteracoes_tabela.transform.G_coluna_variacao_absoluta import cria_coluna_variacao_absoluta
+from alteracoes_tabela.transform.H_coluna_variacao_percentual import cria_coluna_variacao_percentual
+from alteracoes_tabela.transform.I_formato_numerico import formato_numerico_percetual
+from alteracoes_tabela.transform.J_dados_produtos import coleta_dados_categoria
+from alteracoes_tabela.transform.K_valores_filtrados_qtd import desconsidera_valores_por_quantidade
+from alteracoes_tabela.transform.L_selecao_colunas import selecionar_organizar_colunas
 
 from alteracoes_tabela.utils.desconsidera_valores import (remove_valor_zerado, desconsidera_nulos)
 from alteracoes_tabela.utils.padronizar_colunas import (padroniza_data, transforma_float, altera_nome_coluna)
@@ -15,48 +24,37 @@ def extract():
     df = tabela_fornecedor()
     return df
 
-def carrega_excel(df, nome):
-    caminho = fr'S:\price\RELATORIOS\ALTERACOES_TABELA_COMERCIAL\src\alteracoes_tabela\load\staging\{nome}.xlsx'
-    df.to_excel(caminho, index=False)
-
 def transform(df, divisao):
     inicio, fim = define_range_datas(7)
     df = padroniza_data(df)
     df = transforma_float(df, 'VLRCUSTOLIQUIDO')
     df = filtra_divisao(df, divisao)
     df = regra_ordenação_df(df)
-    carrega_excel(df, '1_df_raw')
 
-    df_custo_anterior = coluna_custo_anterior(df,'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR')
-    carrega_excel(df_custo_anterior,'2_df_coluna_custo_anterior')
+    df = regra_coluna_custo_liquido_anterior(df,'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR')
+    df = desconsidera_nulos(df)
+
+    df = cria_coluna_de_validacao(df, 'CUSTO_LIQUIDO_ANTERIOR')
+    df = filtra_valores_validos(df)
+
+    df = filtra_df_pelo_range_datas(df, inicio, fim)
+
+    df = cria_coluna_variacao_absoluta(df, 'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR','VARIACAO_LIQUIDA_ABSOLUTA')
+    df = cria_coluna_variacao_percentual(df,'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR','VARIACAO_LIQUIDA_PERCENTUAL')
     
-    df_nulos = desconsidera_nulos(df_custo_anterior)
-    carrega_excel(df_nulos, '3_df_nulos_desconsiderados')
+    df = formato_numerico_percetual(df, 'VARIACAO_LIQUIDA_PERCENTUAL')
+    df = coleta_dados_categoria(df)
 
-    df_coluna_validacao = cria_coluna_de_validacao(df_nulos, 'CUSTO_LIQUIDO_ANTERIOR')
-    carrega_excel(df_coluna_validacao, '4_df_coluna_validacao')
+    df = desconsidera_valores_por_quantidade(df, 'SEQFORNECEDOR', 5)
 
-    df_validacao_filtrada = filtra_valores_validos(df_coluna_validacao)
-    carrega_excel(df_validacao_filtrada, '5_df_validacao_filtrada_S')
+    df = altera_nome_coluna(df,'FANTASIA','FORNECEDOR')
 
-    df_data_filtrada = filtra_data_pelo_limite(df_validacao_filtrada, inicio, fim)
-    carrega_excel(df_data_filtrada,'6_df_data_filtrada')
-
-    df_variacao_absoluta = cria_coluna_variacao_absoluta(df_data_filtrada, 'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR','VARIACAO_LIQUIDA_ABSOLUTA')
-    df_variacao_percentual = cria_coluna_variacao_percentual(df_variacao_absoluta,'VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR','VARIACAO_LIQUIDA_PERCENTUAL')
+    df = selecionar_organizar_colunas(df,
+                                    ['NRODIVISAO','SEQFAMILIA','SEQPRODUTOS','N1','N2','SEQFORNECEDOR',
+                                    'FORNECEDOR','VLRCUSTOLIQUIDO','CUSTO_LIQUIDO_ANTERIOR',
+                                    'VARIACAO_LIQUIDA_ABSOLUTA','VARIACAO_LIQUIDA_PERCENTUAL'])
     
-    df_nmr_alterado = formato_numerico_percetual(df_variacao_percentual, 'VARIACAO_LIQUIDA_PERCENTUAL')
-    df_dados = coleta_dados_categoria(df_nmr_alterado)
-
-    df_qtd_registro = desconsidera_valores_por_quantidade(df_dados, 'SEQFORNECEDOR', 5)
-    carrega_excel(df_qtd_registro,'7_df_registros_acima_5')
-
-    df_fim = altera_nome_coluna(df_qtd_registro,'FANTASIA','FORNECEDOR')
-    print(df.columns)
-
-    df_pronto = ordena_colunas(df_fim)
-    
-    return df_pronto
+    return df
 
 df = extract()
 df = transform(df, 1)
